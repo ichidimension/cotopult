@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COTOPULT - Speaking Recorder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-indigo: #6366f1;
+            --neon-red: #f43f5e;
+        }
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+        }
+        .font-digital { font-family: 'Orbitron', sans-serif; }
+        
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+        .neon-glow-indigo {
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+        .neon-glow-red {
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.5);
+        }
+        .recording-pulse {
+            animation: pulse-red 2s infinite;
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(244, 63, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+        }
+        /* スクロールバーの非表示（モダンブラウザ用） */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-2xl w-full glass-card rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden">
+        <!-- Decoration background -->
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-rose-600/10 rounded-full blur-3xl"></div>
+
+        <header class="text-center mb-10 relative z-10">
+            <h1 class="text-4xl font-digital font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 mb-2">
+                COTOPULT
+            </h1>
+            <p class="text-slate-400 text-sm uppercase tracking-[0.4em]">Speaking Recorder</p>
+        </header>
+
+        <div class="space-y-8 relative z-10">
+            <!-- Timer Selection -->
+            <div class="flex justify-center gap-4">
+                <button onclick="setTimer(30)" id="btn-30" class="time-btn px-5 py-2 rounded-full border border-slate-700 text-slate-400 text-sm font-semibold hover:border-indigo-500 hover:text-indigo-400 transition-all">30S</button>
+                <button onclick="setTimer(60)" id="btn-60" class="time-btn px-5 py-2 rounded-full border border-indigo-500 bg-indigo-500/10 text-indigo-400 text-sm font-semibold transition-all">1M</button>
+                <button onclick="setTimer(120)" id="btn-120" class="time-btn px-5 py-2 rounded-full border border-slate-700 text-slate-400 text-sm font-semibold hover:border-indigo-500 hover:text-indigo-400 transition-all">2M</button>
+            </div>
+
+            <!-- Digital Display -->
+            <div class="text-center py-6">
+                <div id="timerDisplay" class="font-digital text-8xl font-bold text-white tabular-nums drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">01:00</div>
+                <div id="statusLabel" class="text-[10px] font-bold text-slate-500 mt-4 uppercase tracking-[0.5em]">System Ready</div>
+            </div>
+
+            <!-- Action Button -->
+            <div class="flex justify-center">
+                <button id="actionBtn" class="group w-24 h-24 rounded-full bg-indigo-600 neon-glow-indigo flex items-center justify-center transition-all active:scale-90 relative">
+                    <span id="micIcon" class="text-3xl">🎤</span>
+                    <div id="ring" class="absolute inset-0 rounded-full border-2 border-indigo-400 scale-100 opacity-0 transition-all group-hover:opacity-100 group-hover:scale-110"></div>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <div class="flex justify-between items-center px-1">
+                    <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Live Transcription</span>
+                    <!-- Larger Copy Button -->
+                    <button onclick="copyToClipboard()" class="flex items-center gap-3 text-xs font-bold text-slate-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 px-5 py-2.5 rounded-xl border border-indigo-500/30 transition-all shadow-lg active:scale-95">
+                        <span id="copyText">COPY TRANSCRIPT</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                        </svg>
+                    </button>
+                </div>
+                <textarea id="output" readonly class="w-full h-40 p-6 bg-black/30 border border-white/5 rounded-3xl text-indigo-100 leading-relaxed placeholder:text-slate-700 outline-none resize-none scrollbar-hide text-lg" placeholder="Standing by for voice input..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let recognition;
+        let countdown;
+        let timeLeft = 60;
+        let isRecording = false;
+        let fullTranscript = "";
+        let selectedDuration = 60;
+
+        const timerDisplay = document.getElementById('timerDisplay');
+        const statusLabel = document.getElementById('statusLabel');
+        const actionBtn = document.getElementById('actionBtn');
+        const micIcon = document.getElementById('micIcon');
+        const output = document.getElementById('output');
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (SpeechRecognition) {
+            initRecognition();
+        } else {
+            statusLabel.innerText = "System Error: No Browser Support";
+            actionBtn.style.display = "none";
+        }
+
+        function initRecognition() {
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.continuous = true;
+            recognition.interimResults = true;
+
+            recognition.onresult = (event) => {
+                let interim = "";
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const text = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) fullTranscript += text + " ";
+                    else interim += text;
+                }
+                output.value = fullTranscript + interim;
+                output.scrollTop = output.scrollHeight;
+            };
+
+            recognition.onend = () => {
+                if (isRecording && timeLeft > 0) {
+                    try {
+                        recognition.start();
+                    } catch(e) {
+                        console.error("Restart failed", e);
+                    }
+                }
+            };
+        }
+
+        function setTimer(sec) {
+            if (isRecording) return;
+            selectedDuration = sec;
+            timeLeft = sec;
+            updateDisplay();
+            
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                btn.className = "time-btn px-5 py-2 rounded-full border border-slate-700 text-slate-400 text-sm font-semibold hover:border-indigo-500 hover:text-indigo-400 transition-all";
+            });
+            const active = document.getElementById(`btn-${sec}`);
+            active.className = "time-btn px-5 py-2 rounded-full border border-indigo-500 bg-indigo-500/10 text-indigo-400 text-sm font-semibold transition-all";
+        }
+
+        function updateDisplay() {
+            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const s = (timeLeft % 60).toString().padStart(2, '0');
+            timerDisplay.innerText = `${m}:${s}`;
+        }
+
+        actionBtn.onclick = () => {
+            if (isRecording) stop();
+            else start();
+        };
+
+        function start() {
+            isRecording = true;
+            timeLeft = selectedDuration;
+            fullTranscript = "";
+            output.value = "";
+            
+            actionBtn.classList.replace('bg-indigo-600', 'bg-rose-500');
+            actionBtn.classList.replace('neon-glow-indigo', 'neon-glow-red');
+            actionBtn.classList.add('recording-pulse');
+            micIcon.innerText = "⏹";
+            statusLabel.innerText = "Transcribing Live";
+            statusLabel.classList.replace('text-slate-500', 'text-rose-400');
+            
+            try {
+                recognition.start();
+            } catch(e) {}
+
+            countdown = setInterval(() => {
+                timeLeft--;
+                updateDisplay();
+                if (timeLeft <= 0) {
+                    stop();
+                    statusLabel.innerText = "Task Completed";
+                }
+            }, 1000);
+        }
+
+        function stop() {
+            isRecording = false;
+            clearInterval(countdown);
+            try {
+                recognition.stop();
+            } catch(e) {}
+            
+            actionBtn.classList.replace('bg-rose-500', 'bg-indigo-600');
+            actionBtn.classList.replace('neon-glow-red', 'neon-glow-indigo');
+            actionBtn.classList.remove('recording-pulse');
+            micIcon.innerText = "🎤";
+            statusLabel.classList.replace('text-rose-400', 'text-slate-500');
+            if (timeLeft > 0) statusLabel.innerText = "Manual Stop";
+        }
+
+        function copyToClipboard() {
+            const text = output.value;
+            if (!text) return;
+            
+            // Modern Clipboard API fallback
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(showSuccess, showError);
+            } else {
+                const el = document.createElement('textarea');
+                el.value = text;
+                document.body.appendChild(el);
+                el.select();
+                try {
+                    document.execCommand('copy');
+                    showSuccess();
+                } catch (err) {
+                    showError();
+                }
+                document.body.removeChild(el);
+            }
+        }
+
+        function showSuccess() {
+            const btnLabel = document.getElementById('copyText');
+            btnLabel.innerText = "COPIED!";
+            setTimeout(() => btnLabel.innerText = "COPY TRANSCRIPT", 2000);
+        }
+
+        function showError() {
+            console.error('Copy failed');
+        }
+    </script>
+</body>
+</html>
