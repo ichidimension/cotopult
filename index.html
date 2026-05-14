@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COTOPULT - Speaking Recorder</title>
+    <title>COTOPULT [ proto type ] - Speaking Recorder</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;600&display=swap" rel="stylesheet">
     <style>
@@ -38,7 +38,7 @@
             70% { box-shadow: 0 0 0 15px rgba(244, 63, 94, 0); }
             100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
         }
-        /* スクロールバーの非表示（モダンブラウザ用） */
+        /* スクロールバーの非表示 */
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -51,18 +51,19 @@
         <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-rose-600/10 rounded-full blur-3xl"></div>
 
         <header class="text-center mb-10 relative z-10">
-            <h1 class="text-4xl font-digital font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 mb-2">
-                COTOPULT
+            <h1 class="text-3xl md:text-4xl font-digital font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 mb-2">
+                COTOPULT <span class="text-sm align-middle opacity-100 text-cyan-300 ml-1">[ proto type ]</span>
             </h1>
             <p class="text-slate-400 text-sm uppercase tracking-[0.4em]">Speaking Recorder</p>
         </header>
 
         <div class="space-y-8 relative z-10">
             <!-- Timer Selection -->
-            <div class="flex justify-center gap-4">
-                <button onclick="setTimer(30)" id="btn-30" class="time-btn px-5 py-2 rounded-full border border-slate-700 text-slate-400 text-sm font-semibold hover:border-indigo-500 hover:text-indigo-400 transition-all">30S</button>
-                <button onclick="setTimer(60)" id="btn-60" class="time-btn px-5 py-2 rounded-full border border-indigo-500 bg-indigo-500/10 text-indigo-400 text-sm font-semibold transition-all">1M</button>
-                <button onclick="setTimer(120)" id="btn-120" class="time-btn px-5 py-2 rounded-full border border-slate-700 text-slate-400 text-sm font-semibold hover:border-indigo-500 hover:text-indigo-400 transition-all">2M</button>
+            <div class="flex justify-center gap-3 flex-wrap">
+                <button onclick="setTimer(30)" id="btn-30" class="time-btn px-4 py-2 rounded-full border border-slate-700 text-slate-400 text-xs font-semibold hover:border-indigo-500 hover:text-indigo-400 transition-all">30S</button>
+                <button onclick="setTimer(60)" id="btn-60" class="time-btn px-4 py-2 rounded-full border border-indigo-500 bg-indigo-500/10 text-indigo-400 text-xs font-semibold transition-all">1M</button>
+                <button onclick="setTimer(120)" id="btn-120" class="time-btn px-4 py-2 rounded-full border border-slate-700 text-slate-400 text-xs font-semibold hover:border-indigo-500 hover:text-indigo-400 transition-all">2M</button>
+                <button onclick="setTimer(180)" id="btn-180" class="time-btn px-4 py-2 rounded-full border border-slate-700 text-slate-400 text-xs font-semibold hover:border-indigo-500 hover:text-indigo-400 transition-all">3M</button>
             </div>
 
             <!-- Digital Display -->
@@ -80,15 +81,29 @@
             </div>
 
             <div class="space-y-3">
-                <div class="flex justify-between items-center px-1">
-                    <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Live Transcription</span>
-                    <!-- Larger Copy Button -->
-                    <button onclick="copyToClipboard()" class="flex items-center gap-3 text-xs font-bold text-slate-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 px-5 py-2.5 rounded-xl border border-indigo-500/30 transition-all shadow-lg active:scale-95">
-                        <span id="copyText">COPY TRANSCRIPT</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
-                        </svg>
-                    </button>
+                <div class="flex flex-col gap-3">
+                    <div class="flex justify-between items-center px-1">
+                        <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Live Transcription</span>
+                    </div>
+                    
+                    <!-- Dual Copy Buttons -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <!-- Only Text Button -->
+                        <button onclick="copyOnlyText()" class="flex items-center justify-center gap-2 text-[10px] font-bold text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-3 rounded-xl border border-white/10 transition-all active:scale-95">
+                            <span id="copyOnlyLabel">COPY ONLY TEXT</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </button>
+                        
+                        <!-- AI Prompt Button -->
+                        <button onclick="copyToClipboardWithPrompt()" class="flex items-center justify-center gap-2 text-[10px] font-bold text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 px-4 py-3 rounded-xl border border-indigo-500/30 transition-all shadow-lg active:scale-95">
+                            <span id="copyAiLabel">COPY FOR AI</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <textarea id="output" readonly class="w-full h-40 p-6 bg-black/30 border border-white/5 rounded-3xl text-indigo-100 leading-relaxed placeholder:text-slate-700 outline-none resize-none scrollbar-hide text-lg" placeholder="Standing by for voice input..."></textarea>
             </div>
@@ -153,10 +168,10 @@
             updateDisplay();
             
             document.querySelectorAll('.time-btn').forEach(btn => {
-                btn.className = "time-btn px-5 py-2 rounded-full border border-slate-700 text-slate-400 text-sm font-semibold hover:border-indigo-500 hover:text-indigo-400 transition-all";
+                btn.className = "time-btn px-4 py-2 rounded-full border border-slate-700 text-slate-400 text-xs font-semibold hover:border-indigo-500 hover:text-indigo-400 transition-all";
             });
             const active = document.getElementById(`btn-${sec}`);
-            active.className = "time-btn px-5 py-2 rounded-full border border-indigo-500 bg-indigo-500/10 text-indigo-400 text-sm font-semibold transition-all";
+            active.className = "time-btn px-4 py-2 rounded-full border border-indigo-500 bg-indigo-500/10 text-indigo-400 text-xs font-semibold transition-all";
         }
 
         function updateDisplay() {
@@ -212,13 +227,10 @@
             if (timeLeft > 0) statusLabel.innerText = "Manual Stop";
         }
 
-        function copyToClipboard() {
-            const text = output.value;
-            if (!text) return;
-            
-            // Modern Clipboard API fallback
+        // コピー機能本体
+        function writeToClipboard(text, successFn) {
             if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text).then(showSuccess, showError);
+                navigator.clipboard.writeText(text).then(successFn, () => console.error('Copy failed'));
             } else {
                 const el = document.createElement('textarea');
                 el.value = text;
@@ -226,22 +238,51 @@
                 el.select();
                 try {
                     document.execCommand('copy');
-                    showSuccess();
+                    successFn();
                 } catch (err) {
-                    showError();
+                    console.error('Copy failed');
                 }
                 document.body.removeChild(el);
             }
         }
 
-        function showSuccess() {
-            const btnLabel = document.getElementById('copyText');
-            btnLabel.innerText = "COPIED!";
-            setTimeout(() => btnLabel.innerText = "COPY TRANSCRIPT", 2000);
+        // ① 発話内容のみコピー
+        function copyOnlyText() {
+            const text = output.value.trim();
+            if (!text) return;
+            writeToClipboard(text, () => {
+                const label = document.getElementById('copyOnlyLabel');
+                label.innerText = "COPIED TEXT!";
+                setTimeout(() => label.innerText = "COPY ONLY TEXT", 2000);
+            });
         }
 
-        function showError() {
-            console.error('Copy failed');
+        // ② 発話内容＋プロンプトをコピー
+        function copyToClipboardWithPrompt() {
+            const speechText = output.value.trim();
+            if (!speechText) return;
+
+            const promptTemplate = `以上が学習者の話した英文（以後、これを『学習者のオリジナル発話内容』とします）です。この文章について次の①から⑥のことを実行してください。ただし、①から⑥の結果のみを示し、それ以外の文章は全く表示しないでください。
+
+①学習者が話した英文を次の[1][2]のように直して表示してください。ただし、[1][2]以外は直してはいけません。[1]適切な部分にコンマ、ピリオドを付けてください。[2]必要な部分は小文字を大文字にしてください。また、この①の文章の語数を[ 〇〇 words ]のように表示してください。
+
+②「学習者のオリジナル発話内容」を日本語にしてください。なお、文法的・表現的に不自然な箇所があったとしても、訂正せずにそのまま和訳してください。ここで書かれた日本語を見て、学習者が自分の英文の不自然な部分があるのであれば、それに気づくことを促すためです。
+
+③「学習者のオリジナル発話内容」を適切な語彙・文法に沿った自然な英語表現に直したものを表示してください。
+
+④学習者が伝えたい内容について、頻出する関連する語彙・熟語表現を７つ、その日本語の意味と並べて表示してください。
+
+⑤学習者が伝えたい発話内容を、さらに発展的に述べるための最初の一文を、３つ表示し、その日本語の意味と並べて表示してください。
+
+⑥学習者の発話内容の評価を表示してください。[1] CEFR基準でどの程度のレベルにあるか示してください。[2] 学習者が前向きに次の学習に取り組めるような前向きな総括コメントを表示してください。`;
+
+            const fullContent = speechText + "\n\n" + promptTemplate;
+
+            writeToClipboard(fullContent, () => {
+                const label = document.getElementById('copyAiLabel');
+                label.innerText = "COPIED WITH PROMPT!";
+                setTimeout(() => label.innerText = "COPY FOR AI", 2000);
+            });
         }
     </script>
 </body>
