@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COTOPULT [ proto type ] - Speaking Recorder</title>
+    <title>COTOPULT - Voice Launchpad for AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;600&display=swap" rel="stylesheet">
     <style>
@@ -15,6 +15,7 @@
             background-color: #0f172a;
             color: #f8fafc;
             font-family: 'Inter', sans-serif;
+            overflow: hidden; /* スクロールを禁止し画面内に収める */
         }
         .font-digital { font-family: 'Orbitron', sans-serif; }
         
@@ -27,9 +28,6 @@
         .neon-glow-indigo {
             box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
         }
-        .neon-glow-red {
-            box-shadow: 0 0 20px rgba(244, 63, 94, 0.5);
-        }
         .recording-pulse {
             animation: pulse-red 2s infinite;
         }
@@ -40,59 +38,125 @@
         }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 画面全体にフィットさせるコンテナ */
+        .app-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="bg-[#0f172a]">
 
-    <div class="max-w-2xl w-full glass-card rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden">
-        <div class="absolute -top-24 -right-24 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-rose-600/10 rounded-full blur-3xl"></div>
+    <div class="app-container">
+        <!-- メインカード領域（フッターボタン配置用に最大高さを微調整） -->
+        <div class="max-w-6xl w-full h-full max-h-[660px] glass-card rounded-[2.5rem] p-6 md:p-8 relative overflow-hidden flex flex-col mb-5">
+            
+            <div class="absolute -top-24 -right-24 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-rose-600/10 rounded-full blur-3xl"></div>
 
-        <header class="text-center mb-10 relative z-10">
-            <h1 class="text-3xl md:text-4xl font-digital font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 mb-2">
-                COTOPULT <span class="text-sm align-middle opacity-100 text-cyan-300 ml-1 font-sans">[ proto type ]</span>
-            </h1>
-            <p class="text-slate-400 text-sm uppercase tracking-[0.4em]">Speaking Recorder</p>
-        </header>
+            <!-- 2カラムレイアウト（左：3割 / 右：7割） -->
+            <div class="grid grid-cols-1 sm:grid-cols-10 gap-6 relative z-10 h-full">
+                
+                <!-- 左カラム（タイトル・タイマー設定・ステータス・マイク） -->
+                <div class="sm:col-span-3 flex flex-col justify-between border-b sm:border-b-0 sm:border-r border-white/10 pb-6 sm:pb-0 sm:pr-6 h-full">
+                    
+                    <!-- ① 1行に収めたタイトルエリア -->
+                    <header class="text-center">
+                        <h1 class="inline-block text-2xl sm:text-[1.3rem] md:text-2xl lg:text-4xl font-digital font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 mb-1 whitespace-nowrap pr-4">
+                            COTOPULT
+                        </h1>
+                        <!-- サブタイトル（静的ドット） -->
+                        <div class="flex items-center justify-center gap-1.5 mt-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500/80"></span>
+                            <p class="text-slate-400 text-[9px] uppercase tracking-[0.25em] font-medium">Voice Launchpad for AI</p>
+                        </div>
+                    </header>
 
-        <div class="space-y-8 relative z-10">
-            <div class="flex justify-center gap-3 flex-wrap">
-                <button onclick="setTimer(30)" id="btn-30" class="time-btn px-4 py-2 rounded-full border border-slate-700 text-slate-400 text-xs font-semibold hover:border-indigo-500 hover:text-indigo-400 transition-all">30S</button>
-                <button onclick="setTimer(60)" id="btn-60" class="time-btn px-4 py-2 rounded-full border border-indigo-500 bg-indigo-500/10 text-indigo-400 text-xs font-semibold transition-all">1M</button>
-                <button onclick="setTimer(120)" id="btn-120" class="time-btn px-4 py-2 rounded-full border border-slate-700 text-slate-400 text-xs font-semibold hover:border-indigo-500 hover:text-indigo-400 transition-all">2M</button>
-                <button onclick="setTimer(180)" id="btn-180" class="time-btn px-4 py-2 rounded-full border border-slate-700 text-slate-400 text-xs font-semibold hover:border-indigo-500 hover:text-indigo-400 transition-all">3M</button>
-            </div>
+                    <!-- タイマーボタン＆センタリング表示＆マイクボタンの一体型ブロック -->
+                    <div class="space-y-6 my-auto flex flex-col items-center w-full">
+                        
+                        <!-- ② 3M(3分)ボタンを追加した時間選択エリア -->
+                        <div class="flex gap-1.5 w-full justify-center">
+                            <button onclick="setTimer(30)" id="btn-30" class="time-btn flex-1 py-1.5 rounded-full border border-slate-700 text-slate-400 text-[10px] font-semibold hover:border-indigo-500 transition-all">30S</button>
+                            <button onclick="setTimer(60)" id="btn-60" class="time-btn flex-1 py-1.5 rounded-full border border-indigo-500 bg-indigo-500/10 text-indigo-400 text-[10px] font-semibold transition-all">1M</button>
+                            <button onclick="setTimer(120)" id="btn-120" class="time-btn flex-1 py-1.5 rounded-full border border-slate-700 text-slate-400 text-[10px] font-semibold hover:border-indigo-500 transition-all">2M</button>
+                            <button onclick="setTimer(180)" id="btn-180" class="time-btn flex-1 py-1.5 rounded-full border border-slate-700 text-slate-400 text-[10px] font-semibold hover:border-indigo-500 transition-all">3M</button>
+                        </div>
 
-            <div class="text-center py-6">
-                <div id="timerDisplay" class="font-digital text-8xl font-bold text-white tabular-nums drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">01:00</div>
-                <div id="statusLabel" class="text-[10px] font-bold text-slate-500 mt-4 uppercase tracking-[0.5em]">System Ready</div>
-            </div>
+                        <!-- ③ センタリング配置されたタイマー表示 -->
+                        <div class="text-center w-full">
+                            <div id="timerDisplay" class="font-digital text-5xl lg:text-6xl font-bold text-white tabular-nums">01:00</div>
+                            <div id="statusLabel" class="text-[9px] font-bold text-slate-500 mt-1 uppercase tracking-[0.4em] text-center">System Ready</div>
+                        </div>
 
-            <div class="flex justify-center">
-                <button id="actionBtn" class="group w-24 h-24 rounded-full bg-indigo-600 neon-glow-indigo flex items-center justify-center transition-all active:scale-90 relative">
-                    <span id="micIcon" class="text-3xl">🎤</span>
-                </button>
-            </div>
+                        <!-- ④ タイマー表示の下にマイクボタンを配置 -->
+                        <div class="flex justify-center w-full pt-1">
+                            <button id="actionBtn" class="group w-16 h-16 rounded-full bg-indigo-600 neon-glow-indigo flex items-center justify-center transition-all active:scale-90">
+                                <span id="micIcon" class="text-xl">🎤</span>
+                            </button>
+                        </div>
+                    </div>
 
-            <div class="space-y-3">
-                <div class="flex flex-col gap-3">
-                    <div class="flex justify-between items-center px-1">
+                    <!-- 下部余白調整用 -->
+                    <div class="hidden sm:block h-6"></div>
+                </div>
+
+                <!-- 右カラム（発話テキスト → コピーボタンの順に配置） -->
+                <div class="sm:col-span-7 flex flex-col h-full space-y-3">
+                    
+                    <!-- 上部：見出し -->
+                    <div class="flex items-center justify-between">
                         <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Live Transcription</span>
                     </div>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <button onclick="copyOnlyText()" class="flex items-center justify-center gap-2 text-[10px] font-bold text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-3 rounded-xl border border-white/10 transition-all active:scale-95">
-                            <span id="copyOnlyLabel">COPY ONLY TEXT</span>
+
+                    <!-- 中部：発話テキストエリア（高さを最大化） -->
+                    <div class="flex-grow min-h-0">
+                        <textarea id="output" 
+                                  class="w-full h-full p-5 bg-black/40 border border-white/5 rounded-2xl text-indigo-100 leading-relaxed placeholder:text-slate-800 outline-none resize-none scrollbar-hide text-base md:text-lg" 
+                                  placeholder="Standing by for voice input..."></textarea>
+                    </div>
+
+                    <!-- 下部：コピーボタン（一番下に配置） -->
+                    <div class="flex gap-2 w-full">
+                        <button onclick="copyOnlyText()" class="flex-1 text-[10px] font-bold text-slate-400 hover:text-white bg-white/5 py-3 rounded-xl border border-white/10 transition-all active:scale-95">
+                            <span id="copyOnlyLabel">COPY TEXT</span>
                         </button>
-                        
-                        <button onclick="copyToClipboardWithPrompt()" class="flex items-center justify-center gap-2 text-[10px] font-bold text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 px-4 py-3 rounded-xl border border-indigo-500/30 transition-all shadow-lg active:scale-95">
+                        <button onclick="copyToClipboardWithPrompt()" class="flex-1 text-[10px] font-bold text-indigo-300 hover:text-white bg-indigo-500/10 py-3 rounded-xl border border-indigo-500/30 transition-all active:scale-95">
                             <span id="copyAiLabel">COPY FOR AI</span>
                         </button>
                     </div>
                 </div>
-                <textarea id="output" readonly class="w-full h-40 p-6 bg-black/30 border border-white/5 rounded-3xl text-indigo-100 leading-relaxed placeholder:text-slate-700 outline-none resize-none scrollbar-hide text-lg" placeholder="Standing by for voice input..."></textarea>
+
             </div>
         </div>
+
+        <!-- ⑤ ページ最下部：チャットAIへのリンク（ボタン仕様へ進化＆センタリング） -->
+        <footer class="relative z-10 flex flex-wrap items-center justify-center gap-3 w-full max-w-2xl px-4">
+            
+            <!-- Copilot ボタン -->
+            <a href="https://copilot.microsoft.com/" target="_blank" rel="noopener noreferrer" 
+               class="flex items-center gap-2 px-4 py-2 bg-slate-900/60 border border-white/5 rounded-xl text-xs font-semibold text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-500/30 transition-all duration-300">
+                <span class="text-sm">🤖</span> Copilot
+            </a>
+            
+            <!-- Gemini ボタン -->
+            <a href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer" 
+               class="flex items-center gap-2 px-4 py-2 bg-slate-900/60 border border-white/5 rounded-xl text-xs font-semibold text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 hover:border-indigo-500/30 transition-all duration-300">
+                <span class="text-sm">✨</span> Gemini
+            </a>
+            
+            <!-- ChatGPT ボタン -->
+            <a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" 
+               class="flex items-center gap-2 px-4 py-2 bg-slate-900/60 border border-white/5 rounded-xl text-xs font-semibold text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/30 transition-all duration-300">
+                <span class="text-sm">💬</span> ChatGPT
+            </a>
+            
+        </footer>
     </div>
 
     <script>
@@ -114,6 +178,11 @@
         if (SpeechRecognition) {
             initRecognition();
         }
+
+        // キーボード入力による編集を音声認識用変数と同期させ、コピーや追記が崩れないようにする
+        output.addEventListener('input', () => {
+            fullTranscript = output.value;
+        });
 
         function initRecognition() {
             recognition = new SpeechRecognition();
@@ -138,8 +207,8 @@
             selectedDuration = sec;
             timeLeft = sec;
             updateDisplay();
-            document.querySelectorAll('.time-btn').forEach(btn => btn.className = "time-btn px-4 py-2 rounded-full border border-slate-700 text-slate-400 text-xs font-semibold hover:border-indigo-500 hover:text-indigo-400 transition-all");
-            document.getElementById(`btn-${sec}`).className = "time-btn px-4 py-2 rounded-full border border-indigo-500 bg-indigo-500/10 text-indigo-400 text-xs font-semibold transition-all";
+            document.querySelectorAll('.time-btn').forEach(btn => btn.className = "time-btn flex-1 py-1.5 rounded-full border border-slate-700 text-slate-400 text-[10px] font-semibold hover:border-indigo-500 transition-all");
+            document.getElementById(`btn-${sec}`).className = "time-btn flex-1 py-1.5 rounded-full border border-indigo-500 bg-indigo-500/10 text-indigo-400 text-[10px] font-semibold transition-all";
         }
 
         function updateDisplay() {
@@ -158,7 +227,7 @@
             actionBtn.classList.replace('bg-indigo-600', 'bg-rose-500');
             actionBtn.classList.add('recording-pulse');
             micIcon.innerText = "⏹";
-            statusLabel.innerText = "Transcribing Live";
+            statusLabel.innerText = "Transcribing...";
             try { recognition.start(); } catch(e) {}
             countdown = setInterval(() => {
                 timeLeft--;
@@ -174,48 +243,40 @@
             actionBtn.classList.replace('bg-rose-500', 'bg-indigo-600');
             actionBtn.classList.remove('recording-pulse');
             micIcon.innerText = "🎤";
-            statusLabel.innerText = "Task Completed";
+            statusLabel.innerText = "Completed";
         }
 
         function writeToClipboard(text, successFn) {
-            // iFrame内での権限エラーを避けるため、直接 document.execCommand を使用する手法を優先します
+            const el = document.createElement('textarea');
+            el.value = text;
+            el.style.position = 'fixed';
+            el.style.opacity = '0';
+            document.body.appendChild(el);
+            el.select();
+            el.setSelectionRange(0, 99999);
+            
             try {
-                const el = document.createElement('textarea');
-                el.value = text;
-                // 画面外に配置
-                el.style.position = 'fixed';
-                el.style.left = '-9999px';
-                el.style.top = '0';
-                document.body.appendChild(el);
-                el.select();
-                el.setSelectionRange(0, 99999); // モバイル対応
-
                 const successful = document.execCommand('copy');
-                document.body.removeChild(el);
-                
-                if (successful && successFn) {
-                    successFn();
-                }
+                if (successful) successFn();
             } catch (err) {
-                console.error('Fallback copy failed', err);
+                console.error('Copy failed', err);
             }
+            
+            document.body.removeChild(el);
         }
 
         function copyOnlyText() {
-            // 現在のテキストエリアから直接取得
             const currentSpeech = document.getElementById('output').value.trim();
             if (!currentSpeech) return;
             
-            // プロンプトを含めず、発話内容のみをコピー
             writeToClipboard(currentSpeech, () => {
                 const label = document.getElementById('copyOnlyLabel');
-                label.innerText = "COPIED TEXT!";
-                setTimeout(() => label.innerText = "COPY ONLY TEXT", 2000);
+                label.innerText = "COPIED!";
+                setTimeout(() => label.innerText = "COPY TEXT", 2000);
             });
         }
 
         function copyToClipboardWithPrompt() {
-            // 現在のテキストエリアから直接取得
             const currentSpeech = document.getElementById('output').value.trim();
             if (!currentSpeech) return;
 
@@ -239,12 +300,11 @@
 ⑥ 評価
 学習者の発話内容の評価を表示してください。[1] CEFR基準でどの程度のレベルにあるか示してください。[2] 学習者が前向きに次の学習に取り組めるような前向きな総括コメントを表示してください。`;
 
-            // 発話内容を先頭に結合
-            const combinedContent = currentSpeech + "\n\n" + promptTemplate;
+            const combinedText = currentSpeech + "\n\n" + promptTemplate;
 
-            writeToClipboard(combinedContent, () => {
+            writeToClipboard(combinedText, () => {
                 const label = document.getElementById('copyAiLabel');
-                label.innerText = "COPIED WITH PROMPT!";
+                label.innerText = "COPIED!";
                 setTimeout(() => label.innerText = "COPY FOR AI", 2000);
             });
         }
